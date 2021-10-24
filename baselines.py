@@ -49,9 +49,9 @@ def log_likelihood_base(alpha_log = 1., lengthscale = 10., variance = np.var(yn)
     K = variance*temporal
     # full covariance
     if parser.model in ('regularized_laplacian', 'diffusion', '1_random_walk', '3_random_walk', 'cosine'):
-        CgN = np.kron(B, K) + (np.square(noise) * np.eye(M*N))
+        CgN = np.kron(B, K) + (noise * np.eye(M*N))
     else:
-        CgN = np.kron(np.matmul(B,B.T), K) + (np.square(noise) * np.eye(M*N))
+        CgN = np.kron(np.matmul(B,B.T), K) + (noise * np.eye(M*N))
     L = np.linalg.cholesky(CgN + 1e-10*np.eye(N*M))
     alpha_L = np.linalg.solve(L,ttilde)
 
@@ -144,13 +144,13 @@ if __name__ == '__main__':
         k_star = variance * temporal
     
         if parser.model in ('regularized_laplacian', 'diffusion', '1_random_walk', '3_random_walk', 'cosine'):
-            CgN = np.kron(B.dot(B.T), K) + (noise * np.eye(M*N))
-            D = np.kron(B.dot(B.T), k)
-            F = np.kron(B.dot(B.T), k_star) + (noise * np.eye(M*MM))
-        else:
-            CgN = np.kron(np.matmul(B,B.T), K) + (noise * np.eye(M*N))
+            CgN = np.kron(B, K) + (noise * np.eye(M*N))
             D = np.kron(B, k)
             F = np.kron(B, k_star) + (noise * np.eye(M*MM))
+        else:
+            CgN = np.kron(np.matmul(B,B.T), K) + (noise * np.eye(M*N))
+            D = np.kron(np.matmul(B,B.T), k)
+            F = np.kron(np.matmul(B,B.T), k_star) + (noise * np.eye(M*MM))
 
         # cholesky decomposition
         L = np.linalg.cholesky(CgN + 1e-10*np.eye(N*M))

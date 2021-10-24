@@ -10,9 +10,10 @@ from pygsp import graphs
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--data", default="traffic", type=str, help='traffic, fmri, uber, weather')
+parser.add_argument("--data", default="fmri", type=str, help='traffic, fmri, uber, weather')
 parser.add_argument("--training", default=20, type=int, help='traffic: 10 or 20, fmri: 21 or 42, uber: 10 or 20, weather: 15 or 30')
 parser.add_argument("--degree", default=3, type=int, help='polynomial degree')
+parser.add_argument("--constrained", default='on', type=str, help='change to False to compute posterior directly from unconstrained solution')
 parser.add_argument("--model", default="standard", type=str, help='baseline model (only needed for baselines.py): standard, laplacian, local_averaging, global_filtering, regularized_laplacian, diffusion, 1_random_walk, 3_random_walk, cosine')
 
 parser = parser.parse_args()
@@ -26,7 +27,7 @@ def poly(beta, l):
         out += b*(l**i)
     return out
 
-def log_likelihood_fun(beta, lengthscale = 10., noise = 0.05):
+def log_likelihood_fun(beta, lengthscale = 10., noise = 0.05, xn, yn):
     # spatial
     B = np.sum(np.array([beta[i] * np.linalg.matrix_power(GL, i) for i in range(len(beta))]), axis=0)
     # temporal
@@ -45,17 +46,20 @@ def log_likelihood_fun(beta, lengthscale = 10., noise = 0.05):
 
 from itertools import product
 
-def initialize_beta(degree, grid = np.arange(-5.,6.,1.), lengthscale = 1000., noise = np.sqrt(100.)):
+def initialize_beta(degree, grid = np.arange(-5.,6.,1.), lengthscale = 10., noise = np.sqrt(10.)):
+    if (data_name == 'uber' and N == 20) or (data_name == 'fmri' and N == 42) or (data_name == 'weather' and N == 30):
+        xn_grid = xn[:N/2,:]
+        yn_grid = yn[:N/2,:]
     # find best initial values of beta's using a grid search
     l_old = np.array([[-100000]])
     for b in product(grid, repeat = degree):
         b = np.array(b)
-        l = log_likelihood_fun(b, lengthscale = lengthscale, noise = noise)
+        l = log_likelihood_fun(b, lengthscale = lengthscale, noise = , xn_grid, yn_grid)
         if l >= l_old:
             beta = b
             l_old = l.copy()
     #print 'initial beta =', beta
-    print 'initial log-likelihood =', log_likelihood_fun(beta, lengthscale=lengthscale, noise=noise)
+    print 'initial log-likelihood =', log_likelihood_fun(beta, lengthscale=lengthscale, noise=noise, xn, yn)
     return beta
 
 def unconstrained_search(degree, beta = None, lengthscale = 1000., noise = np.sqrt(100.), rate = 0.0001, rate2 = 0.0001, rate3 = 1., tolerance = 0.0001):
@@ -63,13 +67,13 @@ def unconstrained_search(degree, beta = None, lengthscale = 1000., noise = np.sq
         beta = initialize_beta(degree)
 
     # find optimal using gradient ascent
-    l_old = log_likelihood_fun(beta, lengthscale, noise)
+    l_old = log_likelihood_fun(beta, lengthscale, noise, xn, yn)
     dl = grad(log_likelihood_fun, [0, 1, 2])
     dld = dl(beta, lengthscale, noise)
     beta += rate *np.array(dld[0])
     lengthscale += rate3 * np.array(dld[1])
     noise += rate2 *np.array(dld[2])
-    l = log_likelihood_fun(beta, lengthscale, noise)
+    l = log_likelihood_fun(beta, lengthscale, noise, xn, yn)
     print 'log-likelihood =', l, 'beta =', beta, 'l =', lengthscale, 'n =', noise
     while np.abs(l_old - l) > tolerance:
         l_old = l.copy()
@@ -77,7 +81,7 @@ def unconstrained_search(degree, beta = None, lengthscale = 1000., noise = np.sq
         beta += rate*np.array(dld[0])
         lengthscale += rate3 * np.array(dld[1])
         noise += rate2 *np.array(dld[2])
-        l = log_likelihood_fun(beta, lengthscale, noise)
+        l = log_likelihood_fun(beta, lengthscale, noise, xn, yn)
         print 'log-likelihood =', l, 'beta =', beta, 'l =', lengthscale, 'n =', noise
     print 'unconstrained beta =', beta
     return beta, lengthscale, noise
@@ -142,11 +146,12 @@ def log_likelihood_posterior(x, mu, sigma):
     return -(float(size)/2.)*np.log(2.*np.pi) - (1./2.)*np.linalg.slogdet(sigma)[1] - (1./2.) * np.matmul(alpha_L.T, alpha_L)
     
 if __name__ == '__main__':
-    degree = parser.degree
-    print 'data: {}, degree: {}, training data: {}'.format(data_name, degree, N)
+    degree = parser.degree + 1
+    print 'data: {}, degree: {}, training data: {}, constrained: {}'.format(data_name, degree-1, N, parser.constrained)
     print 'initializing beta'
     l_mean = np.mean(np.sum(np.square(xn), axis = 0))
     beta_initial = initialize_beta(degree, grid = np.arange(-5,6,1.), lengthscale = l_mean, noise = l_mean/10.)
+    #beta_initial = np.array([ 1., -1., -4.,  0.,  5.])
     print beta_initial
 
     beta, lengthscale, noise = unconstrained_search(degree, beta_initial.copy(), lengthscale = l_mean, noise = l_mean/10., rate = 0.001, rate2 = 0.0001, rate3 = 1., tolerance = 0.001)
@@ -154,14 +159,14 @@ if __name__ == '__main__':
     print 'unconstrained beta =', beta
     print 'l = {}, n = {}'.format(lengthscale, noise)
     
-    #l = np.arange(0,1.01,0.01)
-    #if any(poly(beta,l)<0):
-    lagrange = -1.*np.ones((len(w),1))
-    beta = constrained_search(beta, lagrange, lengthscale = lengthscale, noise = noise, rate = 0.0001, rate2 = 0.01, tolerance = 0.001)
-    
-    print 'beta = ', beta
-    print 'l = {}, n = {}'.format(lengthscale, noise)
-    print 'marginal = ', log_likelihood_fun(beta, lengthscale, noise)
+    if parser.constrained == 'on':
+        print 'constrained optimization'
+        lagrange = -1.*np.ones((len(w),1))
+        beta = constrained_search(beta, lagrange, lengthscale = lengthscale, noise = noise, rate = 0.0001, rate2 = 1., tolerance = 0.001)
+        
+        print 'beta = ', beta
+        print 'l = {}, n = {}'.format(lengthscale, noise)
+        print 'marginal = ', log_likelihood_fun(beta, lengthscale, noise, xn, yn)
 
     '''
     compute posteriors
