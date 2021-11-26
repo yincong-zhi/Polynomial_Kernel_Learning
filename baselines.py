@@ -66,8 +66,7 @@ def log_likelihood_posterior(x, mu, sigma):
     return -(float(size)/2.)*np.log(2.*np.pi) - (1./2.)*np.linalg.slogdet(sigma)[1] - (1./2.) * np.matmul(alpha_L.T, alpha_L)
 
 if __name__ == '__main__':
-    print 'data: {}, degree: {}, training data: {}'.format(data_name, parser.degree, N)
-    print 'baseline:', parser.model
+    print 'data: {}, training data: {}, baseline: {}'.format(data_name, N, parser.model)
     
     alpha = np.log(1.)
     lengthscale = np.mean(np.sum(np.square(xn), axis = 1))
@@ -104,7 +103,7 @@ if __name__ == '__main__':
     print 'l =', lengthscale, 'v =', variance, 'n =', noise
 
     ll = []
-    for i in range(1,21):
+    for i in range(1,num_test+1):
         xn1 = xn1T[((i-1)*size):(i*size),:]
         yn1 = yn1T[((i-1)*size):(i*size),:]
 

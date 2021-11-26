@@ -44,6 +44,7 @@ if data_name == 'uber':
 
     M = G.N
     size = 10
+    num_test = 20
 
 elif data_name == 'fmri':
     A = scipy.io.loadmat('data/A_cerebellum.mat')['A']
@@ -73,37 +74,7 @@ elif data_name == 'fmri':
     yn1T = signal[nodes_id, 42:].T
     xn1T = signal[:10, 42:].T
     size = 25
-
-elif data_name == 'traffic':
-    francisco = scipy.io.loadmat('data/traffic_delay_san_francisco.mat')
-    A = francisco['Adj_Matrix']
-    coord = francisco['Coords']
-    delays = francisco['average_delay']
-
-    delays = (delays - np.mean(delays))/np.std(delays)
-
-    #N = 20
-    g_split = 15
-
-    np.random.seed(1)
-    permute = np.random.permutation(range(2798))
-    train_index = permute[:N]
-    test_index = permute[20:]
-
-    # split data into x and y
-    xn = delays[:g_split, train_index].T
-    yn = delays[g_split:, train_index].T
-    ttilde = yn.flatten(order = 'F').reshape(-1,1)
-
-    # split data into x and y
-    xn1T = delays[:g_split, test_index].T
-    yn1T = delays[g_split:, test_index].T
-
-    # use part of the graph
-    G = graphs.Graph(A[g_split:, g_split:])
-    G.set_coordinates(coord[g_split:])
-    M = G.N
-    size = 10
+    num_test = 10
     
 elif data_name == 'weather':
     coord = scipy.io.loadmat('data/city45data.mat')
@@ -134,6 +105,7 @@ elif data_name == 'weather':
 
     M = yn.shape[1]
     size = 6
+    num_test = 10
 
 # max eigenvalue
 #G.compute_laplacian('normalized')
