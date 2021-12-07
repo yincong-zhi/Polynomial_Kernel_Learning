@@ -30,7 +30,13 @@ def poly(beta, l):
 def log_likelihood_fun(beta, lengthscale = 10., noise = 0.05, grid = False):
     # do grid search on the smaller training size if larger is selected
     if grid:
-        xn_in, yn_in = xn[:N/2,:], yn[:N/2,:]
+        if data_name == 'uber':
+            half_d = 10
+        elif data_name == 'fmri':
+            half_d = 21
+        elif data_name == 'weather':
+            half_d = 15
+        xn_in, yn_in = xn[:half_d,:], yn[:half_d,:]
         N_in, ttilde = xn_in.shape[0], yn_in.reshape(-1,1, order = 'F')
     else:
         xn_in, yn_in, N_in, ttilde = xn, yn, N, yn.reshape(-1,1, order = 'F')
@@ -53,7 +59,7 @@ def log_likelihood_fun(beta, lengthscale = 10., noise = 0.05, grid = False):
 from itertools import product
 
 def initialize_beta(degree, grid = np.arange(-6.,7.,1.), lengthscale = 10., noise = np.sqrt(10.)):
-    if (data_name == 'uber' and N == 20) or (data_name == 'fmri' and N == 42) or (data_name == 'weather' and N == 30):
+    if (data_name == 'uber' and N > 10) or (data_name == 'fmri' and N > 21) or (data_name == 'weather' and N > 15):
         half = True
     else:
         half = False
