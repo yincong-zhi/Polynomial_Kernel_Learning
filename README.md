@@ -1,8 +1,11 @@
 # Gaussian Processes on Graphs via Spectral Kernel Learning
 
-This repository contains codes that produced the results in the paper <a href="https://arxiv.org/abs/2006.07361" target="_blank">Gaussian Processes on Graphs via Spectral Kernel Learning</a>.
+This repository contains codes that produced the results in the paper **Gaussian Processes on Graphs via Spectral Kernel Learning**
+<!--
+<a href="https://arxiv.org/abs/2006.07361" target="_blank">Gaussian Processes on Graphs via Spectral Kernel Learning</a>.
+-->
 
-<code>gma</code> folder contains codes for polynomial spectral kernel learning on synthetic data.
+We recommend starting with the <code>gma</code> folder which contains codes for learning on synthetic data.
 
 We use the real world datasets *fmri*, *weather*, and *uber*. The following training sizes are used in the paper: *fmri*: 21 and 42, *uber*: 10 and 20, *weather*: 15 and 30.
 

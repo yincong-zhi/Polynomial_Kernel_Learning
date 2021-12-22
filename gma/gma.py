@@ -13,9 +13,9 @@ SNR = 10.
 
 # graph dimension
 M = 30
-#G = graphs.Sensor(M, seed = 1)
+G = graphs.Sensor(M, seed = 1)
 #G = graphs.ErdosRenyi(M, 0.05, seed = 1)
-G = graphs.BarabasiAlbert(M, 10, 5, seed = 1)
+#G = graphs.BarabasiAlbert(M, 10, 5, seed = 1)
 np.random.seed(1)
 
 def poly(beta, l):
@@ -160,10 +160,10 @@ def constrained_search(beta, lagrange, noise = np.sqrt(0.1), rate = 0.0001, rate
     return beta, noise
 
 if __name__ == '__main__':
-    degree = 3 # initialize degree 5 our more will take quite a while
+    degree = 3 # initialize degree 4 or more will take quite a while
 
     noise = np.sqrt(0.1) # noise std, change accordingly
-    beta_initial = initialize_beta(degree, grid = np.arange(-10,11,2.), noise = noise)
+    beta_initial = initialize_beta(degree, grid = np.arange(-10,11,1.), noise = noise)
     
     beta, noise = unconstrained_search(degree, beta = beta_initial.copy(), noise = noise, rate = 0.0001, rate2 = 0.001, tolerance  = 0.0001)
     
