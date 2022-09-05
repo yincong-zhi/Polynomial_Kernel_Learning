@@ -175,6 +175,7 @@ if __name__ == '__main__':
     
     if parser.constrained == 'on':
         print 'constrained optimization'
+        beta += 1.
         lagrange = -1.*np.ones((len(w),1))
         beta = constrained_search(beta, lagrange, lengthscale = lengthscale, noise = noise, rate = 0.0001, rate2 = 1., tolerance = 0.001)
         

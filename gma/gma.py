@@ -8,12 +8,13 @@ from autograd import grad
 #from invwishart import invwishartrand
 
 # number of signals
-N = 15
+N = 20
 SNR = 10.
 
 # graph dimension
 M = 30
-G = graphs.Sensor(M, seed = 1)
+#G = graphs.Sensor(M, seed = 1)
+G = graphs.ErdosRenyi(M, 0.2, seed = 1)
 #G = graphs.ErdosRenyi(M, 0.05, seed = 1)
 #G = graphs.BarabasiAlbert(M, 10, 5, seed = 1)
 np.random.seed(1)
@@ -53,6 +54,9 @@ yn = z.T + noise.T
 ttilde = yn.flatten(order = 'F').reshape(-1,1)
 # use identity (white noise) as temporal kernel
 K = np.var(yn)*np.eye(N)
+
+plt.plot(w, v.T.dot(yn.T), '.')
+plt.show()
 
 gamma = 0.
 def log_likelihood_fun(beta, noise = np.sqrt(0.1)):
@@ -170,6 +174,7 @@ if __name__ == '__main__':
     l = np.arange(0,1.01,0.01)
     if any(poly(beta, l) < 0):
         print 'solution not psd, needs constrained search'
+        beta += 1.
         lagrange = 0.1*np.ones((len(w),1))
         beta, noise = constrained_search(beta, lagrange, noise, rate = 0.0001, rate2 = 0.1, tolerance = 0.0001)
 

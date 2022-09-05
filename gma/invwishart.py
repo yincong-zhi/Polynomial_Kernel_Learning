@@ -36,5 +36,5 @@ if __name__ == '__main__':
     x = np.array([ invwishartrand(nu,a) for i in range(100)])
     nux = np.array([invwishartrand_prec(nu,a) for i in range(100)])
 
-    print x.shape
-    print np.mean(x,0),"\n", inv(np.mean(nux,0))
+    #print x.shape
+    #print np.mean(x,0),"\n", inv(np.mean(nux,0))
