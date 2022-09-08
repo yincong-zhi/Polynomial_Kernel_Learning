@@ -7,7 +7,10 @@ This repository contains codes that produced the results in the paper **Gaussian
 
 We recommend starting with the <code>gma</code> folder which contains codes for learning on synthetic data.
 
-We use the real world datasets *fmri*, *weather*, and *uber*. The following training sizes are used in the paper: *fmri*: 21 and 42, *uber*: 10 and 20, *weather*: 15 and 30.
+The real world datasets used in the paper are *fmri*, *weather*, and *uber*. The following training sizes are used in the paper: 
+- *fmri*: 21 and 42
+- *uber*: 10 and 20
+- *weather*: 15 and 30.
 
 <code>main.py</code> implements our proposed model of polynomial spectral kernel learning. The following computes a degree 2 polynomial on *weather* data using 15 signals as training (set <code>--constrained</code> to <code>off</code> to skip the constrained optimization step):
 
