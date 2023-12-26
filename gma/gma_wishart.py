@@ -78,7 +78,7 @@ def initialize_beta(degree, grid = np.arange(-6.,7.,2.)):
             beta = b
             l_old = l.copy()
     #print 'initial beta =', beta
-    print 'initial log-likelihood =', log_likelihood_fun(beta)
+    print('initial log-likelihood =', log_likelihood_fun(beta))
     return beta
 
 def unconstrained_search(degree, beta = None, rate = 0.0001, tolerance = 0.0001):
@@ -91,14 +91,14 @@ def unconstrained_search(degree, beta = None, rate = 0.0001, tolerance = 0.0001)
     dld = dl(beta)
     beta += rate *np.array(dld[0])
     l = log_likelihood_fun(beta)
-    print 'log likelihood =', l, 'beta =', beta
+    print('log likelihood =', l, 'beta =', beta)
     while np.abs(l_old - l) > tolerance:
         l_old = l.copy()
         dld = dl(beta)
         beta += rate*np.array(dld[0])
         l = log_likelihood_fun(beta)
-        print 'log-likelihood =', l, 'beta =', beta
-    print 'unconstrained beta =', beta
+        print('log-likelihood =', l, 'beta =', beta)
+    print('unconstrained beta =', beta)
     return beta
 
 # objective: - log-likelihood + lagrange multiplier term
@@ -136,27 +136,27 @@ def constrained_search(beta, lagrange, rate = 0.0001, rate2 = 0.1, tolerance = 0
         dld = dl(beta, lagrange)
         beta -= rate * dld[0]
         l_beta = dual(beta, lagrange)
-        print 'updating beta'
+        print('updating beta')
         while np.abs(l_beta_old - l_beta) > tolerance:
             l_beta_old = l_beta.copy()
             dld = dl(beta, lagrange)
             beta -= rate * dld[0]
             l_beta = dual(beta, lagrange)
             #print 'beta =', beta, l_beta
-        print 'beta =', beta, l_beta
+        print('beta =', beta, l_beta)
         # update lagrange once
         l_lagrange_old = l_lagrange.copy()
         dl = grad(dual, [1])
         dld = dl(beta, lagrange)
         lagrange += rate2 * dld[0]
         l_lagrange = dual(beta, lagrange)
-        print 'updating lagrange,', l_lagrange
+        print('updating lagrange,', l_lagrange)
     return beta
 
 if __name__ == '__main__':
     beta_unconstrained = []
     beta_constrained = []
-    print 'here'
+    #print('here')
     for degree in range(2,6):
         beta_initial = initialize_beta(degree, grid = np.arange(-3.,4.,1.))
         beta = unconstrained_search(degree, beta = beta_initial.copy())
@@ -165,5 +165,5 @@ if __name__ == '__main__':
         beta = constrained_search(beta, lagrange, rate = 0.0001, tolerance = 0.0001)
         beta_constrained.append(beta.copy())
     
-    print beta_unconstrained
-    print beta_constrained
+    print(beta_unconstrained)
+    print(beta_constrained)

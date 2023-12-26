@@ -66,7 +66,7 @@ def log_likelihood_posterior(x, mu, sigma):
     return -(float(size)/2.)*np.log(2.*np.pi) - (1./2.)*np.linalg.slogdet(sigma)[1] - (1./2.) * np.matmul(alpha_L.T, alpha_L)
 
 if __name__ == '__main__':
-    print 'data: {}, training data: {}, baseline: {}'.format(data_name, N, parser.model)
+    print('data: {}, training data: {}, baseline: {}'.format(data_name, N, parser.model))
     
     alpha = np.log(1.)
     lengthscale = np.mean(np.sum(np.square(xn), axis = 1))
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     rate3 = 1. # lengthscale
     rate4 = 0.001 # variance
 
-    print 'log-likelihood =', log_likelihood_base(alpha, lengthscale, variance, noise)
+    print('log-likelihood =', log_likelihood_base(alpha, lengthscale, variance, noise))
     l_old = log_likelihood_base(alpha, lengthscale, variance, noise)
     dl = grad(log_likelihood_base, [0, 1, 2, 3])
     dld = dl(alpha, lengthscale, variance, noise)
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     variance += rate4 * np.array(dld[2])
     noise += rate2 *np.array(dld[3])
     l = log_likelihood_base(alpha, lengthscale, variance, noise)
-    print 'log-likelihood =', l, 'alpha =', alpha, 'l =', lengthscale, 'v =', variance, 'n =', noise
+    print('log-likelihood =', l, 'alpha =', alpha, 'l =', lengthscale, 'v =', variance, 'n =', noise)
     while np.abs(l_old - l) > 0.001:
         l_old = l.copy()
         dld = dl(alpha, lengthscale, variance, noise)
@@ -95,12 +95,12 @@ if __name__ == '__main__':
         variance += rate4 * np.array(dld[2])
         noise += rate2 *np.array(dld[3])
         l = log_likelihood_base(alpha, lengthscale, variance, noise)
-        print 'log-likelihood =', l, 'alpha =', alpha, 'l =', lengthscale, 'v =', variance, 'n =', noise
+        print('log-likelihood =', l, 'alpha =', alpha, 'l =', lengthscale, 'v =', variance, 'n =', noise)
 
-    print 'log-likelihood =', log_likelihood_base(alpha, lengthscale, variance,noise)
+    print('log-likelihood =', log_likelihood_base(alpha, lengthscale, variance,noise))
     if parser.model not in ('standard', 'laplacian', 'cosine'):
-        print 'alpha =', alpha
-    print 'l =', lengthscale, 'v =', variance, 'n =', noise
+        print('alpha =', alpha)
+    print('l =', lengthscale, 'v =', variance, 'n =', noise)
 
     ll = []
     for i in range(1,num_test+1):
@@ -164,5 +164,5 @@ if __name__ == '__main__':
 
         ll.append(float(log_likelihood/size))
 
-    print ll
-    print 'mean = {}, se = {}'.format(np.mean(ll), np.std(ll)/np.sqrt(len(ll)))
+    print(ll)
+    print('mean = {}, se = {}'.format(np.mean(ll), np.std(ll)/np.sqrt(len(ll))))

@@ -80,7 +80,7 @@ def initialize_beta(degree, grid = np.arange(-6.,7.,2.)):
             beta = b
             l_old = l.copy()
     #print 'initial beta =', beta
-    print 'initial log-likelihood =', log_likelihood_fun(beta)
+    print('initial log-likelihood =', log_likelihood_fun(beta))
     return beta
 
 def unconstrained_search(degree, beta = None, noise = np.sqrt(0.1), rate = 0.0001, tolerance = 0.0001):
@@ -94,15 +94,15 @@ def unconstrained_search(degree, beta = None, noise = np.sqrt(0.1), rate = 0.000
     beta += rate *np.array(dld[0])
     noise += 10. * rate *np.array(dld[1])
     l = log_likelihood_fun(beta, noise)
-    print 'log-likelihood =', l, 'beta =', beta, 'noise =', noise
+    print('log-likelihood =', l, 'beta =', beta, 'noise =', noise)
     while np.abs(l_old - l) > tolerance:
         l_old = l.copy()
         dld = dl(beta, noise)
         beta += rate*np.array(dld[0])
         noise += 10. * rate *np.array(dld[1])
         l = log_likelihood_fun(beta, noise)
-        print 'log-likelihood =', l, 'beta =', beta, 'noise =', noise
-    print 'unconstrained beta =', beta
+        print('log-likelihood =', l, 'beta =', beta, 'noise =', noise)
+    print('unconstrained beta =', beta)
     return beta, noise
 
 # objective: - log-likelihood + lagrange multiplier term
@@ -141,7 +141,7 @@ def constrained_search(beta, lagrange, noise = np.sqrt(0.1), rate = 0.0001, rate
         beta -= rate * dld[0]
         #noise -= 10. * rate * dld[1]
         l_beta = dual(beta, lagrange, noise)
-        print 'updating beta'
+        print('updating beta')
         while np.abs(l_beta_old - l_beta) > tolerance:
             l_beta_old = l_beta.copy()
             dld = dl(beta, lagrange, noise)
@@ -149,14 +149,14 @@ def constrained_search(beta, lagrange, noise = np.sqrt(0.1), rate = 0.0001, rate
             #noise -= 10. * rate * dld[1]
             l_beta = dual(beta, lagrange, noise)
             #print l_beta, 'beta =', beta
-        print l_beta, 'beta =', beta
+        print(l_beta, 'beta =', beta)
         # update lagrange once
         l_lagrange_old = l_lagrange.copy()
         dl = grad(dual, [1])
         dld = dl(beta, lagrange, noise)
         lagrange += rate2 * dld[0]
         l_lagrange = dual(beta, lagrange, noise)
-        print 'updating lagrange,', l_lagrange
+        print('updating lagrange,', l_lagrange)
     return beta, noise
 
 if __name__ == '__main__':
@@ -167,7 +167,7 @@ if __name__ == '__main__':
     # constrained search, initialize lagrange multipliers
     lagrange = 0.1*np.ones((len(w),1))
     beta, noise = constrained_search(beta, lagrange, noise, rate = 0.0001, tolerance = 0.0001)
-    print 'beta =', beta
-    print 'noise std =', noise
-    print 'log-likelihood =',log_likelihood_fun(beta, noise)
-    print 'average log-likelihood =', log_likelihood_fun(beta, noise)/N
+    print('beta =', beta)
+    print('noise std =', noise)
+    print('log-likelihood =',log_likelihood_fun(beta, noise))
+    print('average log-likelihood =', log_likelihood_fun(beta, noise)/N)
